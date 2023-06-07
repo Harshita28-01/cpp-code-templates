@@ -1,4 +1,4 @@
-// using priority_queue
+// using priority_queue (not a safe implementation, use only to impress interviewer)
   vector <int> dijkstra(int v, vector<vector<int>> adj[], int s)
     {
         vector<int> dist(v,1e9);
