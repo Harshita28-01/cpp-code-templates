@@ -22,6 +22,28 @@
         return dist;
     }
 
+// priority_queue : safe
+
+  vector <int> dijkstra(int v, vector<vector<int>> adj[], int s)
+    {
+        vector<int> dist(v,1e9);
+        dist[s]=0;
+        priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>> pq;
+        pq.push({0,s});
+        while(pq.size()){
+            int cur=pq.top().second;
+            pq.pop();
+            for(vector<int>& next:adj[cur]){
+                int nextNode=next[0],cost=next[1];
+                if(dist[nextNode]>dist[cur]+cost){
+                    dist[nextNode]=dist[cur]+cost;
+                    pq.push({dist[nextNode],nextNode});
+                }
+            }
+        }
+        return dist;
+    }
+
 // using set (a bit more time optimal but bit less space optimal)
 
   vector <int> dijkstra(int v, vector<vector<int>> adj[], int src)
