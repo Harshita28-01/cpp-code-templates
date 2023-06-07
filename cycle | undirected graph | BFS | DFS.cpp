@@ -41,3 +41,5 @@ bool bfs(int ind,int v, vector<int> adj[],vector<bool>&vis){
         }
         return false;
     }
+
+
