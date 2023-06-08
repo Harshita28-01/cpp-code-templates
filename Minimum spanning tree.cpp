@@ -28,7 +28,7 @@
     }
 
 
-// Kruskal's algorithm- O(E logE) + O(E)
+// Kruskal's algorithm- O(V+E) + O(E logE) + O(E * 4alpha)
 
 class DSU{
     public:
