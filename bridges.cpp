@@ -1,11 +1,11 @@
-  void tarjan(int cur,int prev,int &time,vector<vector<int>> &adj,
+void tarjan(int cur,int prev,int &time,vector<vector<int>> &adj,
                 vector<int> &time_in,vector<int> &low_time,vector<vector<int>> &res){
         time_in[cur]=low_time[cur]=(time++);
         for(int next:adj[cur]){
             if(next==prev){
                 continue;
             }
-            if(time_in[next]>time_in[cur]){
+            if(time_in[next]==-1){
                 tarjan(next,cur,time,adj,time_in,low_time,res);
                 if(time_in[cur]<low_time[next]){
                     res.push_back({cur,next});
@@ -23,9 +23,9 @@ public:
             adj[c[0]].push_back(c[1]);
             adj[c[1]].push_back(c[0]);
         }
-        vector<int> time_in(n,1e9),low_time(n,1e9);
+        vector<int> time_in(n,-1),low_time(n,1e9);
         for(int i=0;i<n;i++){
-            if(time_in[i]==1e9){
+            if(time_in[i]==-1){
                 tarjan(i,-1,time,adj,time_in,low_time,res);
             }
         }
