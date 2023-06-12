@@ -49,7 +49,7 @@
         return inorder;
     }
 
-// 3. Postorder- 1 stacks (but reverse the array)
+// 3.1 Postorder- 1 stack (but reverse the array)
 
   vector<int> postorderTraversal(TreeNode* root) {
         stack<TreeNode*> st;
@@ -69,5 +69,34 @@
             }
         }
         reverse(postorder.begin(),postorder.end());
+        return postorder;
+    }
+
+// 3.2 Postorder- 1 stack (without reversing the array)
+
+  vector<int> postorderTraversal(TreeNode* root) {
+        stack<TreeNode*> st;
+        TreeNode* node=root;
+        vector<int> postorder;
+        while(st.size() || node){
+            if(node){
+                st.push(node);
+                node=node->left;
+            }else{
+                TreeNode* temp=st.top()->right;
+                if(temp==NULL){
+                    temp=st.top();
+                    st.pop();
+                    postorder.push_back(temp->val);
+                    while(st.size() && st.top()->right==temp){
+                        temp=st.top();
+                        st.pop();
+                        postorder.push_back(temp->val);
+                    }
+                }else{
+                    node=temp;
+                }
+            }
+        }
         return postorder;
     }
