@@ -26,7 +26,7 @@
         return preorder;
     }
 
-// 2. Inorder- 1 stack and 1 TreeNode* variable
+// 2.1 Inorder- 1 stack and 1 TreeNode* variable
 
   vector<int> inorderTraversal(TreeNode* root) {
         stack<TreeNode*> st;
@@ -45,6 +45,28 @@
                 inorder.push_back(cur->val);
                 node=cur->right;
             }
+        }
+        return inorder;
+    }
+
+// 2.2 Inorder with a stack
+
+void pushLeft(TreeNode* root,stack<TreeNode*> &st){
+        while(root){
+            st.push(root);
+            root=root->left;
+        }
+    }
+public:
+    vector<int> inorderTraversal(TreeNode* root) {
+        vector<int> inorder;
+        stack<TreeNode*> st;
+        pushLeft(root,st);
+        while(st.size()){
+            TreeNode *node=st.top();
+            st.pop();
+            pushLeft(node->right,st);
+            inorder.push_back(node->val);
         }
         return inorder;
     }
