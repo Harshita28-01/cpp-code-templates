@@ -8,14 +8,19 @@ class Trie {
                 children[i]=NULL;
             }
         }
+        TrieNode* getChild(char c){
+            return children[c-'a'];
+        }
+        bool doesExist(char c){
+            return getChild(c)==NULL;
+        }
+        void createTrieNode(char c){
+            children[c-'a']= new TrieNode();
+        }
     };
     TrieNode* root;
-    TrieNode* getChild(TrieNode* node,char c){
-        return node->children[c-'a'];
-    }
-    bool doesExist(TrieNode* node,char c){
-        return getChild(node,c)==NULL;
-    }
+    
+    
 public:
 
     /** Initialize your data structure here. */
@@ -27,10 +32,10 @@ public:
     void insert(string word) {
         TrieNode *node=root;
         for(char c:word){
-            if(doesExist(node,c)){
-                node->children[c-'a']=new TrieNode();
+            if(node->doesExist(c)){
+                node->createTrieNode(c);
             }
-            node=getChild(node,c);
+            node=node->getChild(c);
         }
         node->isWord=true;
     }
@@ -39,7 +44,7 @@ public:
     bool search(string word) {
         TrieNode *node=root;
         for(char c:word){
-            node=getChild(node,c);
+            node=node->getChild(c);
             if(node==NULL){
                 return false;
             }
@@ -51,7 +56,7 @@ public:
     bool startsWith(string prefix) {
         TrieNode *node=root;
         for(char c:prefix){
-            node=getChild(node,c);
+            node=node->getChild(c);
             if(node==NULL){
                 return false;
             }
