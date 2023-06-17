@@ -3,7 +3,7 @@ class Trie {
         public:
         TrieNode* children[26];
         bool isWord;
-        TrieNode():isWord(){
+        TrieNode():isWord(false){
             for(int i=0;i<26;i++){
                 children[i]=NULL;
             }
