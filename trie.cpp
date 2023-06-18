@@ -166,3 +166,58 @@ class Trie{
         eraseWord(root,word);
     }
 };
+
+
+// Works with binary numbers, useful in XOR-type questions
+
+class Trie{
+    class TrieNode{
+        public:
+        TrieNode *zero,*one;
+        TrieNode() : zero(NULL), one(NULL) {}
+		bool isNode(int bit){
+			if(bit==0){
+				return zero!=NULL;
+			}
+			return one!=NULL;
+		}
+        TrieNode* getNode(bool next){
+            if(next){
+                if(one==NULL){
+                    one=new TrieNode();
+                }
+                return one;
+            }
+            if(zero==NULL){
+                zero=new TrieNode();
+            }
+            return zero;
+        }
+    };
+    bool isBitSet(int &num,int i){
+        return (1<<i) & num;
+    }
+    public:
+    TrieNode *root;
+        Trie():root(new TrieNode()) {}
+
+        void insert(int num){
+            TrieNode* node=root;
+            for(int i=30;i>=0;i--){
+                node=node->getNode(isBitSet(num, i));
+            }
+        }
+		int getMaxXOR(int num){
+			TrieNode *node=root;
+			int res=0;
+			for(int i=30;i>=0 && node;i--){
+				if(node->isNode(1-isBitSet(num, i))){
+					res|=(1<<i);
+					node=node->getNode(1-isBitSet(num, i));
+				}else if(node->isNode(isBitSet(num, i))){
+					node=node->getNode(isBitSet(num, i));
+				}
+			}
+			return res;
+		}
+};
