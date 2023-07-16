@@ -1,3 +1,5 @@
+// Instead of calculating minimum vertex cover, I calculated maximum matching in this bipartite graph (Konig's theorem)
+
 #include <bits/stdc++.h>
   using namespace std;
   
