@@ -492,7 +492,7 @@ void aes(byte plain[16])
     encrypt(plain, w);
 }
 
-void normalAES()
+void normalAES(int noOfTestCases)
 {
     // unsync the I/O of C and C++.
     ios_base::sync_with_stdio(false);
@@ -509,7 +509,7 @@ void normalAES()
     struct timeval start, end;
     double totalTime = 0;
 
-    for (int i = 0; i < 500; i++)
+    for (int i = 0; i < noOfTestCases; i++)
     {
         gettimeofday(&start, NULL);
         word w[4 * (Nr + 1)];
@@ -530,10 +530,10 @@ void normalAES()
                      1e-6;
         totalTime += time_taken;
     }
-    cout << fixed << totalTime / 500 << setprecision(6) << endl;
+    cout << fixed << (totalTime / noOfTestCases) << setprecision(6) << endl;
 }
 
-void AESwithFibonacci()
+void AESwithFibonacci(int noOfTestCases)
 {
     byte key[16] = {0x2b, 0x7e, 0x15, 0x16,
                     0x28, 0xae, 0xd2, 0xa6,
@@ -547,7 +547,7 @@ void AESwithFibonacci()
 
     struct timeval start, end;
     double totalTime = 0;
-    for (int i = 0; i < 500; i++)
+    for (int i = 0; i < noOfTestCases; i++)
     {
         gettimeofday(&start, NULL);
         word w[4 * (Nr + 1)];
@@ -568,7 +568,7 @@ void AESwithFibonacci()
                      1e-6;
         totalTime += time_taken;
     }
-    cout << fixed << totalTime / 500 << setprecision(6) << endl;
+    cout << fixed << ((double)totalTime / noOfTestCases) << setprecision(6) << endl;
 }
 
 int main()
@@ -617,7 +617,8 @@ int main()
 
     double avalancheEffect = static_cast<double>(totalChanges) / (8 * 8 * 16);
     cout << "Avalanche Effect: " << avalancheEffect << endl;
-    normalAES();
-    AESwithFibonacci();
+    int noOfTestCases = 100;
+    normalAES(noOfTestCases);
+    AESwithFibonacci(noOfTestCases);
     return 0;
 }
