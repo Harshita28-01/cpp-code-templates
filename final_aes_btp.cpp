@@ -433,17 +433,17 @@ void KeyExpansionFibonacci(byte key[4 * Nk], word w[4 * (Nr + 1)])
     // The first four of w [] are input key s
     while (i < Nk)
     {
-        Q[i] = Word(key[4 * i], key[4 * i + 1], key[4 * i + 2], key[4 * i + 3]);
+        Q[i] = Word(key[0+i], key[4+i], key[8+i], key[12+i]);
         i++;
     }
 
-    w[0] = bitset<32>((Q[0].to_ulong() * Q[1].to_ulong() - Q[0].to_ulong()) % Q[2].to_ulong());
-    w[1] = bitset<32>((Q[0].to_ulong() * Q[1].to_ulong() - Q[1].to_ulong()) % Q[2].to_ulong());
+    w[0]=bitset<32>((Q[0].to_ulong()*Q[1].to_ulong()-Q[0].to_ulong())%Q[2].to_ulong());
+    w[1]=bitset<32>((Q[0].to_ulong()*Q[1].to_ulong()-Q[1].to_ulong())%Q[2].to_ulong());
     i = 2;
 
-    while (i < 4 * (Nr + 1))
+    while (i < 4*(Nr + 1))
     {
-        w[i] = bitset<32>((w[i - 1].to_ulong() + w[i - 2].to_ulong() + 3 * i) % Q[3].to_ulong());
+        w[i]=bitset<32>((SubWord(w[i-1]).to_ulong()+w[i-2].to_ulong()+3*i)%Q[3].to_ulong());
         ++i;
     }
 }
