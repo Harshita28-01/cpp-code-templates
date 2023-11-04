@@ -261,7 +261,7 @@ byte GFMul(byte a, byte b)
 /**
  *  Column transformation
  */
-void MixColumns(byte mtx[4 * 4])
+void normalMixColumns(byte mtx[4 * 4])
 {
     byte arr[4];
     for (int i = 0; i < 4; ++i)
@@ -273,6 +273,17 @@ void MixColumns(byte mtx[4 * 4])
         mtx[i + 4] = arr[0] ^ GFMul(0x02, arr[1]) ^ GFMul(0x03, arr[2]) ^ arr[3];
         mtx[i + 8] = arr[0] ^ arr[1] ^ GFMul(0x02, arr[2]) ^ GFMul(0x03, arr[3]);
         mtx[i + 12] = GFMul(0x03, arr[0]) ^ arr[1] ^ arr[2] ^ GFMul(0x02, arr[3]);
+    }
+}
+void optimisedMixColumns(byte mtx[4 * 4])
+{
+    for (int i = 0; i < 4; ++i)
+    {
+        mtx[i] = mtx[i] ^ mtx[i + 4] ^ mtx[i + 8] ^ mtx[i + 12] ^ S_Box[6][9];
+        mtx[i + 4] = mtx[i] ^ mtx[i + 4] ^ mtx[i + 8] ^ mtx[i + 12];
+        mtx[i + 8] = mtx[i] ^ mtx[i + 4] ^ mtx[i + 8] ^ mtx[i + 12] ^ S_Box[7][11];
+        mtx[i + 12] = mtx[i] ^ mtx[i + 4] ^ mtx[i + 8] ^ mtx[i + 12] ^ S_Box[9][11];
+        std::swap(mtx[i], mtx[i + 12]);
     }
 }
 
@@ -333,7 +344,7 @@ void InvShiftRows(byte mtx[4 * 4])
     mtx[15] = temp;
 }
 
-void InvMixColumns(byte mtx[4 * 4])
+void normalInvMixColumns(byte mtx[4 * 4])
 {
     byte arr[4];
     for (int i = 0; i < 4; ++i)
@@ -345,6 +356,18 @@ void InvMixColumns(byte mtx[4 * 4])
         mtx[i + 4] = GFMul(0x09, arr[0]) ^ GFMul(0x0e, arr[1]) ^ GFMul(0x0b, arr[2]) ^ GFMul(0x0d, arr[3]);
         mtx[i + 8] = GFMul(0x0d, arr[0]) ^ GFMul(0x09, arr[1]) ^ GFMul(0x0e, arr[2]) ^ GFMul(0x0b, arr[3]);
         mtx[i + 12] = GFMul(0x0b, arr[0]) ^ GFMul(0x0d, arr[1]) ^ GFMul(0x09, arr[2]) ^ GFMul(0x0e, arr[3]);
+    }
+}
+
+void optimisedInvMixColumns(byte mtx[4 * 4])
+{
+    for (int i = 0; i < 4; ++i)
+    {
+        std::swap(mtx[i], mtx[i + 12]);
+        mtx[i + 12] = mtx[i] ^ mtx[i + 4] ^ mtx[i + 8] ^ mtx[i + 12] ^ S_Box[9][11];
+        mtx[i + 8] = mtx[i] ^ mtx[i + 4] ^ mtx[i + 8] ^ mtx[i + 12] ^ S_Box[7][11];
+        mtx[i + 4] = mtx[i] ^ mtx[i + 4] ^ mtx[i + 8] ^ mtx[i + 12];
+        mtx[i] = mtx[i] ^ mtx[i + 4] ^ mtx[i + 8] ^ mtx[i + 12] ^ S_Box[6][9];
     }
 }
 
@@ -433,17 +456,17 @@ void KeyExpansionFibonacci(byte key[4 * Nk], word w[4 * (Nr + 1)])
     // The first four of w [] are input key s
     while (i < Nk)
     {
-        Q[i] = Word(key[0+i], key[4+i], key[8+i], key[12+i]);
+        Q[i] = Word(key[0 + i], key[4 + i], key[8 + i], key[12 + i]);
         i++;
     }
 
-    w[0]=bitset<32>((Q[0].to_ulong()*Q[1].to_ulong()-Q[0].to_ulong())%Q[2].to_ulong());
-    w[1]=bitset<32>((Q[0].to_ulong()*Q[1].to_ulong()-Q[1].to_ulong())%Q[2].to_ulong());
+    w[0] = bitset<32>((Q[0].to_ulong() * Q[1].to_ulong() - Q[0].to_ulong()) % Q[2].to_ulong());
+    w[1] = bitset<32>((Q[0].to_ulong() * Q[1].to_ulong() - Q[1].to_ulong()) % Q[2].to_ulong());
     i = 2;
 
-    while (i < 4*(Nr + 1))
+    while (i < 4 * (Nr + 1))
     {
-        w[i]=bitset<32>((SubWord(w[i-1]).to_ulong()+w[i-2].to_ulong()+3*i)%Q[3].to_ulong());
+        w[i] = bitset<32>((SubWord(w[i - 1]).to_ulong() + w[i - 2].to_ulong() + 3 * i) % Q[3].to_ulong());
         ++i;
     }
 }
@@ -452,7 +475,7 @@ void KeyExpansionFibonacci(byte key[4 * Nk], word w[4 * (Nr + 1)])
 /**
  *  encryption
  */
-void encrypt(byte in[4 * 4], word w[4 * (Nr + 1)])
+void normalEncrypt(byte in[4 * 4], word w[4 * (Nr + 1)])
 {
     word key[4];
     for (int i = 0; i < 4; ++i)
@@ -463,7 +486,7 @@ void encrypt(byte in[4 * 4], word w[4 * (Nr + 1)])
     {
         SubBytes(in);
         ShiftRows(in);
-        MixColumns(in);
+        normalMixColumns(in);
         for (int i = 0; i < 4; ++i)
             key[i] = w[4 * round + i];
         AddRoundKey(in, key);
@@ -479,7 +502,7 @@ void encrypt(byte in[4 * 4], word w[4 * (Nr + 1)])
 /**
  *  Decrypt
  */
-void decrypt(byte in[4 * 4], word w[4 * (Nr + 1)])
+void normalDecrypt(byte in[4 * 4], word w[4 * (Nr + 1)])
 {
     word key[4];
     for (int i = 0; i < 4; ++i)
@@ -493,7 +516,61 @@ void decrypt(byte in[4 * 4], word w[4 * (Nr + 1)])
         for (int i = 0; i < 4; ++i)
             key[i] = w[4 * round + i];
         AddRoundKey(in, key);
-        InvMixColumns(in);
+        normalInvMixColumns(in);
+    }
+
+    InvShiftRows(in);
+    InvSubBytes(in);
+    for (int i = 0; i < 4; ++i)
+        key[i] = w[i];
+    AddRoundKey(in, key);
+}
+
+/**
+ *  encryption
+ */
+void optimisedEncrypt(byte in[4 * 4], word w[4 * (Nr + 1)])
+{
+    word key[4];
+    for (int i = 0; i < 4; ++i)
+        key[i] = w[i];
+    AddRoundKey(in, key);
+
+    for (int round = 1; round < Nr; ++round)
+    {
+        SubBytes(in);
+        ShiftRows(in);
+        optimisedMixColumns(in);
+        for (int i = 0; i < 4; ++i)
+            key[i] = w[4 * round + i];
+        AddRoundKey(in, key);
+    }
+
+    SubBytes(in);
+    ShiftRows(in);
+    for (int i = 0; i < 4; ++i)
+        key[i] = w[4 * Nr + i];
+    AddRoundKey(in, key);
+}
+
+/**
+ *  Decrypt
+ */
+void optimisedDecrypt(byte in[4 * 4], word w[4 * (Nr + 1)])
+{
+    word key[4];
+    for (int i = 0; i < 4; ++i)
+        key[i] = w[4 * Nr + i];
+    AddRoundKey(in, key);
+
+    for (int round = Nr - 1; round > 0; --round)
+    {
+        InvShiftRows(in);
+        InvSubBytes(in);
+        for (int i = 0; i < 4; ++i)
+            key[i] = w[4 * round + i];
+        AddRoundKey(in, key);
+        optimisedInvMixColumns(in);
     }
 
     InvShiftRows(in);
@@ -525,7 +602,7 @@ void aes(byte plain[16])
     KeyExpansion(key, w);
 
     // Encryption, output ciphertext
-    encrypt(plain, w);
+    normalEncrypt(plain, w);
 }
 
 void normalAES(int noOfTestCases)
@@ -560,10 +637,10 @@ void normalAES(int noOfTestCases)
         KeyExpansion(key, w);
 
         // Encryption, output ciphertext
-        encrypt(plain, w);
+        normalEncrypt(plain, w);
 
         // Decrypt, output plaintext
-        decrypt(plain, w);
+        normalDecrypt(plain, w);
 
         gettimeofday(&end, NULL);
         double time_taken;
@@ -577,7 +654,7 @@ void normalAES(int noOfTestCases)
     cout << fixed << (totalTime / noOfTestCases) << setprecision(6) << endl;
 }
 
-void AESwithFibonacci(int noOfTestCases)
+void optimisedAES(int noOfTestCases)
 {
     byte key[16] = {0x2b, 0x7e, 0x15, 0x16,
                     0x28, 0xae, 0xd2, 0xa6,
@@ -608,10 +685,10 @@ void AESwithFibonacci(int noOfTestCases)
         KeyExpansionFibonacci(key, w);
 
         // Encryption, output ciphertext
-        encrypt(plain, w);
+        optimisedEncrypt(plain, w);
 
         // Decrypt, output plaintext
-        decrypt(plain, w);
+        optimisedDecrypt(plain, w);
 
         gettimeofday(&end, NULL);
         double time_taken;
@@ -673,6 +750,6 @@ int main()
     cout << "Avalanche Effect: " << avalancheEffect << endl;
     int noOfTestCases = 200;
     normalAES(noOfTestCases);
-    AESwithFibonacci(noOfTestCases);
+    optimisedAES(noOfTestCases);
     return 0;
 }
