@@ -1041,7 +1041,7 @@ int main()
     random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<int> distribution(0, 127);
-    int noOfTestCases = 100;
+    int noOfTestCases = 500;
     double normalAESTime = 0, DESTime = 0, optimisedAESTime = 0;
     for (int i = 0; i < noOfTestCases; i++)
     {
@@ -1054,8 +1054,8 @@ int main()
         DESTime += DES(key, plain);
         optimisedAESTime += optimisedAES(key, plain);
     }
-    cout << "Original AES Time: " << normalAESTime << endl;
-    cout << "DES Time: " << DESTime << endl;
-    cout << "Optimised AES Time: " << optimisedAESTime << endl;
+    cout << "Original AES Time: " << (normalAESTime / noOfTestCases) << endl;
+    cout << "DES Time: " << (DESTime / noOfTestCases) << endl;
+    cout << "Optimised AES Time: " << (optimisedAESTime / noOfTestCases) << endl;
     return 0;
 }
