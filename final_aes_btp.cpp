@@ -42,10 +42,13 @@ const int Nk = 4;  // Nk d
 
 //         if (i > 200)
 //         {
-//             int x6 = (int)(x * 1000000) % 10;
-//             int y5 = (int)(y * 100000) % 10;
-//             int z4 = (int)(z * 10000) % 10;
-//             int num = (x6 * 100 + y5 * 10 + z4) % 256;
+//             int x3=(int)(x*1000)%10;
+// int x4=(int)(x*10000)%10;
+// int x5=(int)(x*100000)%10;
+// int y3=(int)(y*1000)%10;
+// int y4=(int)(y*10000)%10;
+// int y5=(int)(y*100000)%10;
+// int num=(y3*1000+y4*100+x3*10+x4)%256;
 //             num = abs(num);
 //             byte b = bitset<8>(num);
 //             st.insert(b);
